@@ -1,4 +1,5 @@
-﻿using MigrationTools.Tools.Interfaces;
+﻿using MigrationTools.Markdown;
+using MigrationTools.Tools.Interfaces;
 
 namespace MigrationTools.Tools
 {
@@ -25,6 +26,7 @@ namespace MigrationTools.Tools
         /// <param name="exportWorkItemMapping">Tool for exporting work item mapping.</param>
         /// <param name="workItemTypeValidatorTool">Tool for work item type validation.</param>
         /// <param name="fieldMappingTool">Tool for field mapping operations</param>
+        /// <param name="markdownProcessor">Tool for Markdown detection and conversion.</param>
         public TfsCommonTools(
             TfsUserMappingTool userMappingEnricher,
             TfsAttachmentTool attachmentEnricher,
@@ -40,8 +42,9 @@ namespace MigrationTools.Tools
             IWorkItemTypeMappingTool workItemTypeMapping,
             IExportWorkItemMappingTool exportWorkItemMapping,
             TfsWorkItemTypeValidatorTool workItemTypeValidatorTool,
-            IFieldMappingTool fieldMappingTool
-            ) : base(StringManipulatorTool, workItemTypeMapping, exportWorkItemMapping, fieldMappingTool)
+            IFieldMappingTool fieldMappingTool,
+            MarkdownProcessingTool markdownProcessor
+            ) : base(StringManipulatorTool, workItemTypeMapping, exportWorkItemMapping, fieldMappingTool, markdownProcessor)
         {
             UserMapping = userMappingEnricher;
             Attachment = attachmentEnricher;

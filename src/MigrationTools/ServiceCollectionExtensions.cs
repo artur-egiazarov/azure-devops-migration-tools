@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using MigrationTools.EndpointEnrichers;
 using MigrationTools.Enrichers;
+using MigrationTools.Markdown;
 using MigrationTools.Options;
 using MigrationTools.Processors;
 using MigrationTools.Processors.Infrastructure;
@@ -47,6 +48,7 @@ namespace MigrationTools
             context.AddSingleton<IStringManipulatorTool, StringManipulatorTool>().AddMigrationToolsOptions<StringManipulatorToolOptions>(configuration);
             context.AddSingleton<IWorkItemTypeMappingTool, WorkItemTypeMappingTool>().AddMigrationToolsOptions<WorkItemTypeMappingToolOptions>(configuration);
             context.AddSingleton<IExportWorkItemMappingTool, ExportWorkItemMappingTool>().AddMigrationToolsOptions<ExportWorkItemMappingToolOptions, ExportWorkItemMappingToolOptionsValidator>(configuration);
+            context.AddSingleton<MarkdownProcessingTool>().AddMigrationToolsOptions<MarkdownProcessingOptions>(configuration);
 
             // context.AddSingleton<GitRepoMappingTool>().AddMigrationToolsOptions<GitRepoMappingToolOptions>(configuration);
 

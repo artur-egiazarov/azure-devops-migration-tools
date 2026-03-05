@@ -1,4 +1,5 @@
-﻿using MigrationTools.Tools.Interfaces;
+﻿using MigrationTools.Markdown;
+using MigrationTools.Tools.Interfaces;
 
 namespace MigrationTools.Tools
 {
@@ -28,22 +29,30 @@ namespace MigrationTools.Tools
         public IFieldMappingTool FieldMappingTool { get; private set; }
 
         /// <summary>
+        /// Gets the Markdown processing tool for detecting and converting Markdown in work item fields.
+        /// </summary>
+        public MarkdownProcessingTool MarkdownProcessor { get; private set; }
+
+        /// <summary>
         /// Initializes a new instance of the CommonTools class.
         /// </summary>
         /// <param name="StringManipulatorTool">Tool for string field manipulation.</param>
         /// <param name="workItemTypeMapping">Tool for work item type mapping.</param>
         /// <param name="exportWorkItemMapping">Tool for exporting work item mapping.</param>
         /// <param name="fieldMappingTool">Tool for field mapping operations.</param>
+        /// <param name="markdownProcessor">Tool for Markdown detection and conversion.</param>
         public CommonTools(
             IStringManipulatorTool StringManipulatorTool,
             IWorkItemTypeMappingTool workItemTypeMapping,
             IExportWorkItemMappingTool exportWorkItemMapping,
-            IFieldMappingTool fieldMappingTool)
+            IFieldMappingTool fieldMappingTool,
+            MarkdownProcessingTool markdownProcessor)
         {
             StringManipulator = StringManipulatorTool;
             WorkItemTypeMapping = workItemTypeMapping;
             ExportWorkItemMapping = exportWorkItemMapping;
             FieldMappingTool = fieldMappingTool;
+            MarkdownProcessor = markdownProcessor;
         }
     }
 }

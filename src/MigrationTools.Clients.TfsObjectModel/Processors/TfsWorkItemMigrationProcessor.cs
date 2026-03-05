@@ -20,6 +20,7 @@ using MigrationTools._EngineV1.DataContracts;
 using MigrationTools.Clients;
 using MigrationTools.DataContracts;
 using MigrationTools.Enrichers;
+using MigrationTools.Markdown;
 using MigrationTools.Processors.Infrastructure;
 using MigrationTools.Services;
 using MigrationTools.Tools;
@@ -76,6 +77,7 @@ namespace MigrationTools.Processors
         private ILogger contextLog;
         private ILogger workItemLog;
         private List<string> _itemsInError;
+        private readonly MarkdownProcessingTool _markdownProcessor;
 
         public WorkItemMetrics workItemMetrics { get; private set; }
 
@@ -90,6 +92,7 @@ namespace MigrationTools.Processors
         {
             contextLog = Serilog.Log.ForContext<TfsWorkItemMigrationProcessor>();
             workItemMetrics = services.GetRequiredService<WorkItemMetrics>();
+            _markdownProcessor = services.GetRequiredService<MarkdownProcessingTool>();
         }
 
         new TfsWorkItemMigrationProcessorOptions Options => (TfsWorkItemMigrationProcessorOptions)base.Options;
@@ -515,6 +518,7 @@ namespace MigrationTools.Processors
                         case FieldType.String:
                             string oldValue = oldWorkItem.Fields[f.ReferenceName].Value.ToString();
                             string newValue = CommonTools.StringManipulator.ProcessString(oldValue);
+                            newValue = _markdownProcessor.ProcessFieldValue(newValue, f.ReferenceName);
                             newWorkItem.Fields[f.ReferenceName].Value = newValue;
                             break;
                         default:
@@ -560,7 +564,9 @@ namespace MigrationTools.Processors
 
             var description = new StringBuilder();
             description.Append(oldWorkItem.Description);
-            newWorkItem.Description = description.ToString();
+            var descriptionValue = description.ToString();
+            descriptionValue = _markdownProcessor.ProcessFieldValue(descriptionValue, "System.Description");
+            newWorkItem.Description = descriptionValue;
             fieldMappingTimer.Stop();
         }
 
@@ -856,7 +862,17 @@ namespace MigrationTools.Processors
                     // Impersonate revision author. Mapping will apply later and may change this.
                     targetWorkItem.ToWorkItem().Fields["System.ChangedDate"].Value = revision.ChangedDate;
                     targetWorkItem.ToWorkItem().Fields["System.ChangedBy"].Value = revision.Fields["System.ChangedBy"].Value.ToString();
-                    targetWorkItem.ToWorkItem().Fields["System.History"].Value = revision.Fields["System.History"].Value;
+                    var historyValue = revision.Fields["System.History"].Value;
+                    if (historyValue != null)
+                    {
+                        var historyString = historyValue.ToString();
+                        historyString = _markdownProcessor.ProcessFieldValue(historyString, "System.History");
+                        targetWorkItem.ToWorkItem().Fields["System.History"].Value = historyString;
+                    }
+                    else
+                    {
+                        targetWorkItem.ToWorkItem().Fields["System.History"].Value = historyValue;
+                    }
 
                     // Todo: Ensure all field maps use WorkItemData.Fields to apply a correct mapping
                     CommonTools.FieldMappingTool.ApplyFieldMappings(currentRevisionWorkItem, targetWorkItem);
